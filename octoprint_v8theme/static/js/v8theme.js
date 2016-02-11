@@ -627,7 +627,7 @@ $(function() {
       $(".sd-trigger a:first").html('<i class="icon-file"></i>');
       $("#temp").remove();
       $("#term").remove();
-      $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
+      // $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
 
       // Manage extra contents of .tab-content 
       $("#gcode").remove();
@@ -649,6 +649,28 @@ $(function() {
         localStorage["voxel8.gcodeFiles.currentSorting"] = self.currentSorting;
         self.files.listHelper.changeSorting(self.currentSorting);
       }
+
+      self.control._enableWebcam();
+    };
+
+    self.control._enableWebcam = function() {
+        if (self.control.webcamDisableTimeout != undefined) {
+            clearTimeout(self.control.webcamDisableTimeout);
+        }
+        var webcamImage = $("#webcam_image");
+        var currentSrc = webcamImage.attr("src");
+        if (currentSrc === undefined || currentSrc.trim() == "") {
+            var newSrc = CONFIG_WEBCAM_STREAM;
+            if (CONFIG_WEBCAM_STREAM.lastIndexOf("?") > -1) {
+                newSrc += "&";
+            } else {
+                newSrc += "?";
+            }
+            newSrc += new Date().getTime();
+
+            self.control.updateRotatorWidth();
+            webcamImage.attr("src", newSrc);
+        }
     };
 
     self.oldControl = self.customControls.rerenderControls;
