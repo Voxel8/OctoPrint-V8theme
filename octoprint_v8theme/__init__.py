@@ -36,7 +36,7 @@ def get_update_information(*args, **kwargs):
             type="github_commit",
             user="Voxel8",
             repo="OctoPrint-V8theme",
-            branch='master',
+            branch='st/safe-homing',
             pip="https://github.com/Voxel8/OctoPrint-V8theme/archive/{target_version}.zip",
         )
     )
