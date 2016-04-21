@@ -182,6 +182,16 @@ $(function() {
             "command": "M42 P2 S255",
             "name": "Open Valve",
             "width": "3"
+          },
+          {
+            "commands": ["M400", "M42 P75 S0"],
+            "name": "Raise Silver",
+            "width": "3"
+          },
+          {
+            "commands": ["M400", "M42 P75 S255"],
+            "name": "Lower Silver",
+            "width": "3"
           }],
           "layout": "horizontal_grid",
           "name": "Pneumatics"
