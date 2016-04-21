@@ -204,7 +204,7 @@ $(function() {
               "G28",
               "G29",
               "G1 Z0.5",
-              "G92 Z10.5"
+              "M211 Z0 S0"
             ],
             "name": "Start Bed Re-Zeroing"
           },
@@ -226,8 +226,7 @@ $(function() {
           },
           {
             "commands": [
-              "M852 Z10",
-              "G92 Z0",
+              "M852",
               "G1 Z10",
               "G28 X Y"
             ],
