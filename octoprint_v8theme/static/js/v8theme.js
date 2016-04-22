@@ -173,6 +173,16 @@ $(function() {
             "command": "M42 P2 S255",
             "name": "Open Valve",
             "width": "3"
+          },
+          {
+            "commands": ["M400", "M42 P75 S0"],
+            "name": "Raise Silver",
+            "width": "3"
+          },
+          {
+            "commands": ["M400", "M42 P75 S255"],
+            "name": "Lower Silver",
+            "width": "3"
           }],
           "layout": "horizontal_grid",
           "name": "Pneumatics"
@@ -185,7 +195,7 @@ $(function() {
               "G28",
               "G29",
               "G1 Z0.5",
-              "G92 Z10.5"
+              "M211 Z0 S0"
             ],
             "name": "Start Bed Re-Zeroing"
           },
@@ -207,8 +217,7 @@ $(function() {
           },
           {
             "commands": [
-              "M852 Z10",
-              "G92 Z0",
+              "M852",
               "G1 Z10",
               "G28 X Y"
             ],
