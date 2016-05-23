@@ -191,11 +191,16 @@ $(function() {
           "children": [
           {
             "commands": [
-              "M851 Z-3",
+              "T0",
+              "M851 Z-10",
+              "M500",
               "G28",
               "G29",
-              "G1 Z0.5",
-              "M211 Z0 S0"
+              "G90",
+              "G1 X75 Y75",
+              "G91",
+              "G1 Z-2.5",
+              "G90"
             ],
             "name": "Start Bed Re-Zeroing"
           },
