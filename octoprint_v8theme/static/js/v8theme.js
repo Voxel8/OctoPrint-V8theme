@@ -130,16 +130,24 @@ $(function() {
       if (typeof self.temperature.plot !== "undefined") self.temperature.plot.unhighlight();
     }
 
-    /* Modified from OctoPrint
-     * Reason: Change homing button to run G28 & G29 instead of built in homing function
-     */
     self.onBeforeBinding = function () {
       $("#customControls_containerTemplate_collapsable, #customControls_containerTemplate_nameless").html(function() {
         return $(this).html().replace(/"custom_section">/g, '"custom_section" data-bind="css: { plugin_control: (plugin_control) }">');
       });
     };
 
+    /* Modified from OctoPrint
+     * Reason: Change homing button to run G28 & G29 instead of built in homing function
+     */
     self.control.onBeforeBinding = function () {
+      $(".control-box").attr("data-bind", function(i, val) {
+        if (val == null) { return; }
+        if (val.indexOf("command:'M106'") >= 0) {
+          return val.replace(/command:'M106'/g, "command:'M106 S255'");
+        } else {
+          return;
+        }
+      });
       $("#control-xyhome").attr("data-bind", function() {
         return $(this).attr("data-bind").replace(/sendHomeCommand\(\[\'x\', \'y\'\]\)/g, "sendCustomCommand({type:'commands',commands:['G28', 'G29']})");
       });
