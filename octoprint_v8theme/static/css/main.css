@@ -457,6 +457,7 @@ a.accordion-toggle {
 }
 .custom_section_horizontal form.custom_control button, .custom_section_vertical form.custom_control button {
   margin-right: 15px;
+  margin-bottom: 15px;
 }
 .custom_section_vertical .slider, .custom_section_horizontal .slider {
   margin-right: 15px;
@@ -1125,6 +1126,12 @@ ul.terminal-options .divider {
 
 #Pneumatics_main .custom_section_horizontal_grid .span3.first {
   margin-left: 0px;
+}
+#webcam_wrapper .accordion-inner {
+  padding: 0px;
+}
+#wirebonding-div .btn {
+  margin-right: 15px;
 }
 /*=================================================
  VII. HELPERS
