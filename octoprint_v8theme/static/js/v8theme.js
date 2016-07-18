@@ -629,6 +629,8 @@ $(function() {
       $("#term").remove();
       $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
 
+      $("#Pneumatics_main .custom_section_horizontal_grid .span3").first().addClass("first");
+
       // Manage extra contents of .tab-content 
       $("#gcode").remove();
       var tabContentHTML = $(".main-content-wrapper").html().replace(/<!-- ko allowBindings: false -->|<!-- \/ko -->|<!-- ko allowBindings: true -->/g, "");
