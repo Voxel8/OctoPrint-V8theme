@@ -672,9 +672,7 @@ $(function() {
       $("#term").remove();
 
       $("#control_main div[data-bind*='keycontrolPossible']").remove();
-      if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
-        $("#webcam_container").appendTo("#webcam_wrapper .accordion-inner");
-      }
+      $("#webcam_container").appendTo("#webcam_wrapper .accordion-inner");
 
       $("#Pneumatics_main .custom_section_horizontal_grid .span3").first().addClass("first");
 
@@ -775,6 +773,7 @@ $(function() {
         },
         success: function  (response) {
           if (!self.settings.webcam.enabled()) {
+            console.log((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 );
             if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
               var notice = new PNotify({
                 title: "Webcam Detected",
