@@ -16,7 +16,7 @@ class V8themePlugin(octoprint.plugin.SettingsPlugin,
     def get_settings_defaults(self):
         return dict(
             webcam=dict(
-                enabled=True
+                enabled=False
                 )
         )
 
