@@ -8,6 +8,7 @@ $(function() {
     self.control = parameters[4];
     self.customControls = parameters[5];
     self.loginState = parameters[6];
+    self.webcamTimeout = null;
 
     /* Modified from OctoPrint
      * Reason: Need to identify which custom controls are created by plugins
@@ -404,11 +405,12 @@ $(function() {
       $("#control").prepend($("#term").contents());
       $(".octoprint-container .tab-content").before("<div id='temperature_monitor'></div><div id='temperature_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#temperature_main'><i class='icon-info-sign'></i> Temperature </a><div class='heading_buttons'><button class='btn btn-mini btn-default btn-sm text-light7 temperature-height'>Expand</button></div></div><div id='temperature_main' class='accordion-body collapse in '><div class='accordion-inner'></div></div><div class='panel-footer pn'><div class='row-fluid table-layout'><div class='span4 panel-sidemenu border-right'> <h4 class='mb25 pl25'>Tool Temperature</h4> <div class='media active' data-toggle='tab' data-target='#hotend_temp'><span class='pull-left span6 hotend_temp'></span><div class='media-body span6'><div class='bulletColor' style='background-color: "+ flotColors[0] +";'></div><h5 class='media-heading p4'>Hotend<br></h5> </div> </div> <div class='media' data-toggle='tab' data-target='#bed_temp'><span class='pull-left span6 bed_temp'></span><div class='media-body span6'><div class='bulletColor' style='background-color: "+ flotColors[2] +";'></div><h5 class='media-heading p4'>Build Plate<br></h5> </div> </div> </div><div class='span8 va-m p15 pt20 temp_wrapper'><div class='tab-content'><div id='hotend_temp' class='tab-pane active'><h4 class='mb25'>Hotend Control</h4><div class='row-fluid'><div class='span6 pl15 pr15'><h6>Manual Control</h6><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Target</label></div><div class='span9'><div class='input-group hotend_target'></div></div></div><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Offset</label></div><div class='span9'><div class='input-group hotend_offset'></div></div></div></div><div class='span6 pl15'><h6>Temperature Presets</h6><div class='btn-spread'></div></div></div></div><div id='bed_temp' class='tab-pane'><h4 class='mb25'>Build Plate Control</h4><div class='row-fluid'><div class='span6 pl15 pr15'><h6>Manual Control</h6><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Target</label></div><div class='span9'><div class='input-group bed_target'></div></div></div><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Offset</label></div><div class='span9'><div class='input-group bed_offset'></div></div></div></div><div class='span6 pl15'><h6>Temperature Presets</h6><div class='btn-spread'></div></div></div></div></div></div></div></div></div>");
       $("#temperature_wrapper").after("<div id='control_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#control_main'><i class='icon-info-sign'></i> Control </a></div><div id='control_main' class='accordion-body collapse in'><div class='accordion-inner'></div></div>");
+      $("#control_wrapper").after("<div id='webcam_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#webcam_main'><i class='icon-info-sign'></i> Webcam</a></div><div id='webcam_main' class='accordion-body collapse in'><div class='accordion-inner hide-accordion'><div id='webcam-error' class='hide-error'>There was an issue retrieving the source of the webcam. Please try reloading the page.</div></div></div>");
+      $("#webcam_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
       if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
-        $("#control_wrapper").after("<div id='webcam_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#webcam_main'><i class='icon-info-sign'></i> Webcam</a></div><div id='webcam_main' class='accordion-body collapse in'><div class='accordion-inner hide-accordion'><div id='webcam-error' class='hide-error'>There was an issue retrieving the source of the webcam. Please try reloading the page.</div></div></div>");
-        $("#webcam_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
+        $("#webcam_wrapper").show();
       } else {
-        $("#control_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
+        $("#webcam_wrapper").hide();
       }
 
       $("#temperature-graph").parent().next(".row-fluid").prependTo("#temperature_main .accordion-inner");
@@ -626,8 +628,14 @@ $(function() {
       $("#webcam_container img").load(function() {
         $("#webcam_main .accordion-inner").removeClass("hide-accordion");
         $("#webcam-error").addClass("hide-error");
+        $(this).show();
+        clearTimeout(self.webcamTimeout);
       }).error(function() {
-        $(this).remove();
+        clearTimeout(self.webcamTimeout);
+        if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
+          self.webcamTimeout = setTimeout(function(){ self.control._enableWebcam(); }, 1000);
+        }
+        $(this).attr("src", "").hide();
         $("#webcam_main .accordion-inner").removeClass("hide-accordion");
         $("#webcam-error").removeClass("hide-error");
       });
@@ -663,11 +671,9 @@ $(function() {
       $("#temp").remove();
       $("#term").remove();
 
+      $("#control_main div[data-bind*='keycontrolPossible']").remove();
       if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
-        $("#control_main div[data-bind*='keycontrolPossible']").remove();
         $("#webcam_container").appendTo("#webcam_wrapper .accordion-inner");
-      } else {
-        $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
       }
 
       $("#Pneumatics_main .custom_section_horizontal_grid .span3").first().addClass("first");
@@ -693,6 +699,7 @@ $(function() {
         self.files.listHelper.changeSorting(self.currentSorting);
       }
       self.control._enableWebcam();
+      self.checkForWebcam();
     };
 
     self.oldControl = self.customControls.rerenderControls;
@@ -733,6 +740,13 @@ $(function() {
         } else {
           self.hidePrinterName();
         }
+        if (data.webcam_enabled == true) {
+          // Webcam setting has changed, let's re-enable the webcam
+          self.control._enableWebcam();
+          $("#webcam_wrapper").show();
+        } else if (data.webcam_enabled == false) {
+          $("#webcam_wrapper").hide("fast");
+        }
       }
     }
 
@@ -749,6 +763,66 @@ $(function() {
     self.hidePrinterName = function() {
       document.title = "Voxel8 DevKit";
       $(".nav.pull-left").css("display", "none");
+    }
+
+    self.checkForWebcam = function() {
+      $.ajax ({
+        url: CONFIG_WEBCAM_STREAM,
+        type: "GET",
+        headers: {          
+             Accept : "image/png,image/*;q=0.8,*/*;q=0.5",         
+            "Content-Type": "image/png,image/*;q=0.8,*/*;q=0.5"   
+        },
+        success: function  (response) {
+          if (!self.settings.webcam.enabled()) {
+            if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
+              var notice = new PNotify({
+                title: "Webcam Detected",
+                text: "A webcam has been detected, but you have webcam support disabled. Would you like to enable your webcam now?",
+                icon: false,
+                hide: false,
+                confirm: {
+                  confirm: true,
+                  buttons: [{
+                    text: "Enable",
+                    promptTrigger: true,
+                    addClass: "btn-primary",
+                    click: function(notice, value) {
+                      self.control._enableWebcam();
+                      $("#webcam_wrapper").show();
+                      $.ajax({
+                        type: "POST",
+                        url: "/api/plugin/v8theme",
+                        data: JSON.stringify({
+                          command: 'enable_webcam'
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                      });
+                      notice.remove();
+                      localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
+                      notice.get().trigger("pnotify.confirm", [notice, value]);
+                    }
+                  }, {
+                    text: "Cancel",
+                    click: function(notice) {
+                      localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
+                      notice.remove();
+                      notice.get().trigger("pnotify.cancel", notice);
+                    }
+                  }]
+                },
+                buttons: {
+                  closer: false,
+                  sticker: false
+                },
+                insert_brs: false
+              });
+            }
+          }
+          return;
+        }
+      });
     }
   }
 

@@ -28,7 +28,8 @@ class V8themePlugin(octoprint.plugin.SettingsPlugin,
 
     def get_api_commands(self):
         return dict(
-            update_printer_name=[]
+            update_printer_name=[],
+            enable_webcam=[]
         )
 
     def on_api_command(self, command, data):
@@ -36,9 +37,21 @@ class V8themePlugin(octoprint.plugin.SettingsPlugin,
             self.printer_name = data.get("printer_name")
             self._plugin_manager.send_plugin_message(
                 self._identifier, dict(printer_name=self.printer_name))
+        elif command == "enable_webcam":
+            self._settings.set_boolean(["webcam", "enabled"], True)
+            self._settings.save()
 
     def on_api_get(self, request):
         return flask.jsonify(printer_name=self.printer_name)
+
+    def on_settings_save(self, data):
+        old_webcam_settings = self._settings.get(["webcam"])
+        octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+        new_webcam_settings = self._settings.get(["webcam"])
+
+        if old_webcam_settings["enabled"] != new_webcam_settings["enabled"]:
+            self._plugin_manager.send_plugin_message(self._identifier, dict(
+                webcam_enabled=new_webcam_settings["enabled"]))
 
     # Handles turning off pneumatic devices when print is paused or cancelled
     # Returns in the form (prefix, postfix)
