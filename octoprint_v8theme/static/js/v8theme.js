@@ -7,6 +7,7 @@ $(function() {
     self.settings = parameters[3];
     self.control = parameters[4];
     self.customControls = parameters[5];
+    self.loginState = parameters[6];
 
     /* Modified from OctoPrint
      * Reason: Need to identify which custom controls are created by plugins
@@ -36,6 +37,26 @@ $(function() {
       self.oldProcess(control);
       control.plugin_control = control.hasOwnProperty("plugin_control") ? ko.observable(true) : ko.observable(false);
       return control;
+    };
+
+    self.control._enableWebcam = function() {
+      if (self.control.webcamDisableTimeout != undefined) {
+        clearTimeout(self.control.webcamDisableTimeout);
+      }
+      var webcamImage = $("#webcam_image");
+      var currentSrc = webcamImage.attr("src");
+      if (currentSrc === undefined || currentSrc.trim() == "") {
+        var newSrc = CONFIG_WEBCAM_STREAM;
+        if (CONFIG_WEBCAM_STREAM.lastIndexOf("?") > -1) {
+          newSrc += "&";
+        } else {
+          newSrc += "?";
+        }
+        newSrc += new Date().getTime();
+
+        self.control.updateRotatorWidth();
+        webcamImage.attr("src", newSrc);
+      }
     };
 
     /* Modified from OctoPrint
@@ -137,6 +158,7 @@ $(function() {
       $("#customControls_containerTemplate_collapsable, #customControls_containerTemplate_nameless").html(function() {
         return $(this).html().replace(/"custom_section">/g, '"custom_section" data-bind="css: { plugin_control: (plugin_control) }">');
       });
+      self.settings = self.settings.settings.plugins.v8theme;
     };
 
     self.control.onBeforeBinding = function () {
@@ -381,8 +403,13 @@ $(function() {
       $("#term").closest(".tab-content").addClass("main-content-wrapper");
       $("#control").prepend($("#term").contents());
       $(".octoprint-container .tab-content").before("<div id='temperature_monitor'></div><div id='temperature_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#temperature_main'><i class='icon-info-sign'></i> Temperature </a><div class='heading_buttons'><button class='btn btn-mini btn-default btn-sm text-light7 temperature-height'>Expand</button></div></div><div id='temperature_main' class='accordion-body collapse in '><div class='accordion-inner'></div></div><div class='panel-footer pn'><div class='row-fluid table-layout'><div class='span4 panel-sidemenu border-right'> <h4 class='mb25 pl25'>Tool Temperature</h4> <div class='media active' data-toggle='tab' data-target='#hotend_temp'><span class='pull-left span6 hotend_temp'></span><div class='media-body span6'><div class='bulletColor' style='background-color: "+ flotColors[0] +";'></div><h5 class='media-heading p4'>Hotend<br></h5> </div> </div> <div class='media' data-toggle='tab' data-target='#bed_temp'><span class='pull-left span6 bed_temp'></span><div class='media-body span6'><div class='bulletColor' style='background-color: "+ flotColors[2] +";'></div><h5 class='media-heading p4'>Build Plate<br></h5> </div> </div> </div><div class='span8 va-m p15 pt20 temp_wrapper'><div class='tab-content'><div id='hotend_temp' class='tab-pane active'><h4 class='mb25'>Hotend Control</h4><div class='row-fluid'><div class='span6 pl15 pr15'><h6>Manual Control</h6><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Target</label></div><div class='span9'><div class='input-group hotend_target'></div></div></div><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Offset</label></div><div class='span9'><div class='input-group hotend_offset'></div></div></div></div><div class='span6 pl15'><h6>Temperature Presets</h6><div class='btn-spread'></div></div></div></div><div id='bed_temp' class='tab-pane'><h4 class='mb25'>Build Plate Control</h4><div class='row-fluid'><div class='span6 pl15 pr15'><h6>Manual Control</h6><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Target</label></div><div class='span9'><div class='input-group bed_target'></div></div></div><div class='row-fluid'><div class='span3'><label for='spinner' class='control-label'>Offset</label></div><div class='span9'><div class='input-group bed_offset'></div></div></div></div><div class='span6 pl15'><h6>Temperature Presets</h6><div class='btn-spread'></div></div></div></div></div></div></div></div></div>");
-      $("#temperature_wrapper").after("<div id='control_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#control_main'><i class='icon-info-sign'></i> Control </a></div><div id='control_main' class='accordion-body collapse in '><div class='accordion-inner'></div></div>");
-      $("#control_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
+      $("#temperature_wrapper").after("<div id='control_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#control_main'><i class='icon-info-sign'></i> Control </a></div><div id='control_main' class='accordion-body collapse in'><div class='accordion-inner'></div></div>");
+      if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
+        $("#control_wrapper").after("<div id='webcam_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#webcam_main'><i class='icon-info-sign'></i> Webcam</a></div><div id='webcam_main' class='accordion-body collapse in'><div class='accordion-inner hide-accordion'><div id='webcam-error' class='hide-error'>There was an issue retrieving the source of the webcam. Please try reloading the page.</div></div></div>");
+        $("#webcam_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
+      } else {
+        $("#control_wrapper").after("<div id='terminal_wrapper' class='accordion-group'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse' data-target='#terminal_main'><i class='icon-info-sign'></i> Commands <div class='terminal_input'></div></a></div><div id='terminal_main' class='accordion-body collapse'><div class='accordion-inner'></div></div>");
+      }
 
       $("#temperature-graph").parent().next(".row-fluid").prependTo("#temperature_main .accordion-inner");
       $("#temperature-graph").prependTo("#temperature_main .accordion-inner");
@@ -596,6 +623,14 @@ $(function() {
           self.hidePrinterName();
         }
       });
+      $("#webcam_container img").load(function() {
+        $("#webcam_main .accordion-inner").removeClass("hide-accordion");
+        $("#webcam-error").addClass("hide-error");
+      }).error(function() {
+        $(this).remove();
+        $("#webcam_main .accordion-inner").removeClass("hide-accordion");
+        $("#webcam-error").removeClass("hide-error");
+      });
     };
 
     self.onAfterTabChange = function(current, previous) {
@@ -627,7 +662,15 @@ $(function() {
       $(".sd-trigger a:first").html('<i class="icon-file"></i>');
       $("#temp").remove();
       $("#term").remove();
-      $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
+
+      if (CONFIG_WEBCAM_STREAM && self.settings.webcam.enabled()) {
+        $("#control_main div[data-bind*='keycontrolPossible']").remove();
+        $("#webcam_container").appendTo("#webcam_wrapper .accordion-inner");
+      } else {
+        $("#webcam_container, #control_main div[data-bind*='keycontrolPossible']").remove();
+      }
+
+      $("#Pneumatics_main .custom_section_horizontal_grid .span3").first().addClass("first");
 
       // Manage extra contents of .tab-content 
       $("#gcode").remove();
@@ -649,6 +692,7 @@ $(function() {
         localStorage["voxel8.gcodeFiles.currentSorting"] = self.currentSorting;
         self.files.listHelper.changeSorting(self.currentSorting);
       }
+      self.control._enableWebcam();
     };
 
     self.oldControl = self.customControls.rerenderControls;
@@ -709,8 +753,8 @@ $(function() {
   }
 
   OCTOPRINT_VIEWMODELS.push([
-    V8ThemeViewModel, ["temperatureViewModel", "terminalViewModel", "gcodeFilesViewModel", "settingsViewModel", "controlViewModel", "customControlViewModel"],
-    []
+    V8ThemeViewModel, ["temperatureViewModel", "terminalViewModel", "gcodeFilesViewModel", "settingsViewModel", "controlViewModel", "customControlViewModel", "loginStateViewModel"],
+    ["#settings_plugin_v8theme"]
   ]);
 });
 
