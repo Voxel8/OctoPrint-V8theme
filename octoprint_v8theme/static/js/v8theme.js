@@ -765,6 +765,7 @@ $(function() {
 
     self.checkForWebcam = function() {
       console.log((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 );
+      console.log(localStorage["plugin.v8theme.seen_webcam_enable"]);
       $.ajax ({
         url: CONFIG_WEBCAM_STREAM,
         type: "GET",
@@ -819,7 +820,9 @@ $(function() {
               });
             }
           }
-          return;
+        },
+        error: function() {
+          console.log("ERROR");
         }
       });
     }
