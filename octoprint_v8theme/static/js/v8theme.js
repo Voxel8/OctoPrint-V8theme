@@ -764,6 +764,7 @@ $(function() {
     }
 
     self.checkForWebcam = function() {
+      console.log((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 );
       $.ajax ({
         url: CONFIG_WEBCAM_STREAM,
         type: "GET",
@@ -772,7 +773,6 @@ $(function() {
             "Content-Type": "image/png,image/*;q=0.8,*/*;q=0.5"   
         },
         success: function  (response) {
-          console.log((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 );
           if (!self.settings.webcam.enabled()) {
             if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
               var notice = new PNotify({
