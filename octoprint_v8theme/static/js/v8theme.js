@@ -825,7 +825,7 @@ $(function() {
         error: function() {
           console.log("ERROR");
         },
-        done: function() {
+        always: function() {
           console.log("DONE");
         }
       });
