@@ -770,10 +770,10 @@ $(function() {
         url: CONFIG_WEBCAM_STREAM + "&testme",
         type: "GET",
         headers: {          
-             Accept : "image/png,image/*;q=0.8,*/*;q=0.5",         
-            "Content-Type": "image/png,image/*;q=0.8,*/*;q=0.5"   
+             Accept : "image/png,image/*;q=0.8,*/*;q=0.5",
         },
         success: function  (response) {
+          console.log("success");
           if (!self.settings.webcam.enabled()) {
             if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
               console.log("RENDER NOTIFICATION");
