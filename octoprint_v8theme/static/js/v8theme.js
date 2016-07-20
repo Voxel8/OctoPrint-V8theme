@@ -769,9 +769,6 @@ $(function() {
       $.ajax ({
         url: CONFIG_WEBCAM_STREAM + "&testme",
         type: "GET",
-        headers: {          
-             Accept : "image/png,image/*;q=0.8,*/*;q=0.5",
-        },
         success: function  (response) {
           console.log("success");
           if (!self.settings.webcam.enabled()) {
