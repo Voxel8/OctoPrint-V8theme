@@ -771,56 +771,59 @@ $(function() {
         type: "GET",
         success: function  (response) {
           console.log("success");
-          if (!self.settings.webcam.enabled()) {
-            if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
-              console.log("RENDER NOTIFICATION");
-              var notice = new PNotify({
-                title: "Webcam Detected",
-                text: "A webcam has been detected, but you have webcam support disabled. Would you like to enable your webcam now?",
-                icon: false,
-                hide: false,
-                confirm: {
-                  confirm: true,
-                  buttons: [{
-                    text: "Enable",
-                    promptTrigger: true,
-                    addClass: "btn-primary",
-                    click: function(notice, value) {
-                      self.control._enableWebcam();
-                      $("#webcam_wrapper").show();
-                      $.ajax({
-                        type: "POST",
-                        url: "/api/plugin/v8theme",
-                        data: JSON.stringify({
-                          command: 'enable_webcam'
-                        }),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json"
-                      });
-                      notice.remove();
-                      localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
-                      notice.get().trigger("pnotify.confirm", [notice, value]);
-                    }
-                  }, {
-                    text: "Cancel",
-                    click: function(notice) {
-                      localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
-                      notice.remove();
-                      notice.get().trigger("pnotify.cancel", notice);
-                    }
-                  }]
-                },
-                buttons: {
-                  closer: false,
-                  sticker: false
-                },
-                insert_brs: false
-              });
-            }
-          }
+          // if (!self.settings.webcam.enabled()) {
+          //   if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
+          //     console.log("RENDER NOTIFICATION");
+          //     var notice = new PNotify({
+          //       title: "Webcam Detected",
+          //       text: "A webcam has been detected, but you have webcam support disabled. Would you like to enable your webcam now?",
+          //       icon: false,
+          //       hide: false,
+          //       confirm: {
+          //         confirm: true,
+          //         buttons: [{
+          //           text: "Enable",
+          //           promptTrigger: true,
+          //           addClass: "btn-primary",
+          //           click: function(notice, value) {
+          //             self.control._enableWebcam();
+          //             $("#webcam_wrapper").show();
+          //             $.ajax({
+          //               type: "POST",
+          //               url: "/api/plugin/v8theme",
+          //               data: JSON.stringify({
+          //                 command: 'enable_webcam'
+          //               }),
+          //               contentType: "application/json; charset=utf-8",
+          //               dataType: "json"
+          //             });
+          //             notice.remove();
+          //             localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
+          //             notice.get().trigger("pnotify.confirm", [notice, value]);
+          //           }
+          //         }, {
+          //           text: "Cancel",
+          //           click: function(notice) {
+          //             localStorage["plugin.v8theme.seen_webcam_enable"] = new Date().getTime();
+          //             notice.remove();
+          //             notice.get().trigger("pnotify.cancel", notice);
+          //           }
+          //         }]
+          //       },
+          //       buttons: {
+          //         closer: false,
+          //         sticker: false
+          //       },
+          //       insert_brs: false
+          //     });
+          //   }
+          // }
         },
         error: function() {
           console.log("Error");
+        },
+        complete: function() {
+          console.log("Done");
         }
       });
     }
