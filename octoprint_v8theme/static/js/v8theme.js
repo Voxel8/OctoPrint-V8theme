@@ -767,7 +767,7 @@ $(function() {
       console.log((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 );
       console.log(localStorage["plugin.v8theme.seen_webcam_enable"]);
       $.ajax ({
-        url: CONFIG_WEBCAM_STREAM,
+        url: "CONFIG_WEBCAM_STREAM",
         type: "GET",
         headers: {          
              Accept : "image/png,image/*;q=0.8,*/*;q=0.5",         
@@ -823,10 +823,7 @@ $(function() {
           }
         },
         error: function() {
-          console.log("ERROR");
-        },
-        always: function() {
-          console.log("DONE");
+          console.log("Error");
         }
       });
     }
