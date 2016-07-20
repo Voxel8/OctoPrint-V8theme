@@ -765,10 +765,10 @@ $(function() {
 
     self.checkForWebcam = function() {
       var img = new Image();
+      var hasFired = false;
       img.onload = function() {
         if (!self.settings.webcam.enabled()) {
-          if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined) {
-            console.log("RENDER NOTIFICATION");
+          if ((new Date - localStorage["plugin.v8theme.seen_webcam_enable"]) > 604800000 || localStorage["plugin.v8theme.seen_webcam_enable"] == undefined && hasFired == false) {
             var notice = new PNotify({
               title: "Webcam Detected",
               text: "A webcam has been detected, but you have webcam support disabled. Would you like to enable your webcam now?",
@@ -811,6 +811,7 @@ $(function() {
               },
               insert_brs: false
             });
+            hasFired = true;
           }
         }
       };
