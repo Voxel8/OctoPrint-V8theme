@@ -714,7 +714,7 @@ $(function() {
         timeInSecs = timeInSecs % 3600;
         var minutes = Math.floor(timeInSecs / 60);
         timeInSecs = timeInSecs % 60;
-        var seconds = timeInSecs;
+        var seconds = timeInSecs.toFixed(1);
         var notification = new Notification(payload.filename + ' - Print Complete', {
           icon: '/plugin/v8theme/static/square_logo.png',
           body: "Your print is complete after " + hours + " hour(s), " + minutes + " minute(s), and " + seconds + " second(s).",
