@@ -334,6 +334,7 @@ $(function() {
         if (!heaterOptions) return;
 
         _.each(_.keys(heaterOptions), function(type) {
+          console.log(self.temperature.temperatures);
           if (type == "bed" && !self.temperature.hasBed()) {
             return;
           }
