@@ -6,11 +6,19 @@ import flask
 
 
 class V8themePlugin(octoprint.plugin.SettingsPlugin,
+                    octoprint.plugin.TemplatePlugin,
                     octoprint.plugin.AssetPlugin,
                     octoprint.plugin.SimpleApiPlugin,
                     octoprint.plugin.StartupPlugin):
 
     printer_name = ""
+
+    def get_settings_defaults(self):
+        return dict(
+            webcam=dict(
+                enabled=False
+                )
+        )
 
     def get_assets(self):
         return dict(
@@ -52,6 +60,12 @@ class V8themePlugin(octoprint.plugin.SettingsPlugin,
                     "{target_version}.zip",
             )
         )
+
+    def get_template_configs(self):
+        return [
+            dict(type="settings", name="Voxel8",
+                 data_bind="visible: loginState.isAdmin()"),
+        ]
 
 
 def __plugin_load__():
